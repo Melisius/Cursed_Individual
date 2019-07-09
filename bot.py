@@ -75,6 +75,8 @@ async def adminhelp(ctx):
 async def shutdown(ctx):
     if ctx.author.id not in bot.admins:
         await ctx.send("Haha denied! "+ctx.author.mention)
+    if "Direct Message" not in str(ctx.channel):
+        await ctx.message.delete()
     await ctx.bot.logout()
 
 
