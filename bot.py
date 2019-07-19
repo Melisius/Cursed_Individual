@@ -6,13 +6,11 @@ import matplotlib.pyplot as plt
 import os
 import numpy as np
 import asyncio
-from music import Music
 
 
 bot = commands.Bot(command_prefix='>')
 bot.remove_command('help')
 bot.admins = [265865052878405642,209434080385695744,264362912779337730]
-bot.add_cog(Music(bot))
 
 bot.censor_list = []
 f = open("censor_list.txt","r")
