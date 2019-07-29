@@ -110,17 +110,17 @@ async def add_white_list(ctx, word):
         
         
 @bot.command()
-async def remove_white_list(ctx, word):
+async def remove_white_list(ctx, remove_word):
     if ctx.author.id not in bot.admins:
         await ctx.send("Haha denied! "+ctx.author.mention)
     else:
-        word = word.lower()
-        if word in bot.white_list:
+        remove_word = remove_word.lower()
+        if remove_word in bot.white_list:
             f = open("white_list.txt.bak","w+")
             for word in bot.white_list:
                 f.write(word+"\n")
             f.close()
-            bot.white_list.remove(word)
+            bot.white_list.remove(remove_word)
             f = open("white_list.txt","w+")
             for word in bot.white_list:
                 f.write(word+"\n")
@@ -161,17 +161,17 @@ async def add_censor_list(ctx, word):
 
 
 @bot.command()
-async def remove_censor_list(ctx, word):
+async def remove_censor_list(ctx, remove_word):
     if ctx.author.id not in bot.admins:
         await ctx.send("Haha denied! "+ctx.author.mention)
     else:
-        word = word.lower()
-        if word in bot.censor_list:
+        remove_word = remove_word.lower()
+        if remove_word in bot.censor_list:
             f = open("censor_list.txt.bak","w+")
             for word in bot.censor_list:
                 f.write(word+"\n")
             f.close()
-            bot.censor_list.remove(word)
+            bot.censor_list.remove(remove_word)
             f = open("censor_list.txt","w+")
             for word in bot.censor_list:
                 f.write(word+"\n")
@@ -238,7 +238,6 @@ async def help(ctx):
     say += "**>help**\nWill show this message.\n\n"
     say += "**>latex** *string*\nWill render the string as mathmode-LaTeX and send it as a png.\n\n"
     say += "**>monospace** *string*\nWill render the string in monospace font and send it as a png."
-    #say += "**>musichelp**\nWills show avaible music commands."
     await ctx.send(say, delete_after=120)
     if "Direct Message" not in str(ctx.channel):
         await ctx.message.delete()
@@ -246,13 +245,14 @@ async def help(ctx):
 
 @bot.command()
 async def danishjoke(ctx):
-    jokes = ["Why are asians yellow?\nBecause they **fucks** in curry!",
-             "Why dosen't icecubes have any arms or legs?\nBecause they are **watermade**!",
-             "What is the name of the worlds poorest king?\n**King Course**!",
-             "Why has the Zoo in Odense never been sold?\nBecause it is too **animal**!",
-             "What do you call chinese rockers?\n**Carrots**!",
-             "How do you get a fish to laugh?\nYou put it in **spring water**!",
-             "What is a pig called on Mars?\n**Guinea pig**!"]
+    jokes = ["Why are asians yellow?\n||Because they **fucks** in curry!||",
+             "Why dosen't icecubes have any arms or legs?\n||Because they are **watermade**!||",
+             "What is the name of the worlds poorest king?\n||**King Course**!||",
+             "Why has the Zoo in Odense never been sold?\n||Because it is too **animal**!||",
+             "What do you call chinese rockers?\n||**Carrots**!||",
+             "How do you get a fish to laugh?\n||You put it in **spring water**!||",
+             "What is a pig called on Mars?\n||**Guinea pig**!||",
+             "Why is it only fathers who can drink from Kattegat?\n||Because it is **fatherwater**!||"]
     joke_idx = np.random.randint(0, len(jokes))
     await ctx.send(jokes[joke_idx]+"  "+ctx.author.mention)
     if "Direct Message" not in str(ctx.channel):
@@ -264,7 +264,7 @@ async def latex(ctx, *, arg):
     try:
         SizeX = 0.1
         SizeY = 0.1
-        plt.rc('font', size=24)  # controls default text sizes
+        plt.rc('font', size=24)
         fig = plt.figure(figsize=(SizeX, SizeY))
         plt.text(0,0,r"$"+arg+"$")
         plt.axis("off")
@@ -281,7 +281,7 @@ async def monospace(ctx, *, arg):
     try:
         SizeX = 0.1
         SizeY = 0.1
-        plt.rc('font', size=12)  # controls default text sizes
+        plt.rc('font', size=12) 
         fig = plt.figure(figsize=(SizeX, SizeY))
         arg = arg.replace("$","\$")
         plt.text(0,0,arg,family="monospace")
@@ -313,7 +313,7 @@ async def on_message(msg):
         if msg.content[0:2] == ";;":
             await msg.delete(delay=20)
             return
-    if msg.author.id == 184405311681986560:
+    if msg.author.id == 184405311681986560: #music bot
         await msg.delete(delay=20)
         return
     
@@ -376,17 +376,17 @@ async def on_message(msg):
                 
                 
     """SOME CUSTOM RESPONSES"""
-    if " 69 " in msg.content:
+    if in_message("69", msg.content):
         await msg.channel.send("Hehe 69")
-    if " 420 " in msg.content:
+    if in_message("420", msg.content):
         await msg.channel.send("420 blaze it")
-    if " 9/11 " in msg.content:
+    if in_message("9/11", msg.content):
         await msg.channel.send("Bush did 9/11")
-    if " 1337 " in msg.content:
+    if in_message("1337", msg.content):
         await msg.channel.send("1337 is leet")
-    if msg.content.lower() == "hello there":
+    if message_is("hello there", msg.content.lower()):
         await msg.channel.send("General Kenobi")
-    if msg.content.lower() == "hotel":
+    if message_is("hotel", msg.content.lower()):
         await msg.channel.send("Trivago")
 
 
@@ -394,7 +394,7 @@ async def on_message(msg):
 async def on_message_edit(old_msg, msg):
     if msg.author.id == bot.user.id:
         return
-    if msg.author.id == 184405311681986560:
+    if msg.author.id == 184405311681986560: #music bot
         return
 
     """CENSORING"""
@@ -456,7 +456,24 @@ async def on_member_update(before, after):
             censored_msg = " ".join(censored_word)
             if "□" in censored_msg:
                 await after.edit(nick=censored_msg)
+
  
+def in_message(word, msg):
+    if word in msg.split():
+        return True
+    return False
+    
+    
+def message_is(word, msg):
+    if word == msg:
+        return True
+    else:
+        endlist = [".","?","!"]
+        for item in endlist:
+            if word == msg+item:
+                return True
+    return False
+
 
 with open('TOKEN') as f:
     TOKEN = f.readline()
