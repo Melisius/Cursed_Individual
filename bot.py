@@ -31,6 +31,12 @@ for line in f:
         bot.mistakes_dict[line.strip("\n").split(":")[0]] = line.strip("\n").split(":")[1]
 f.close()
 
+bot.consistency_list = []
+f = open("consistency_list.txt","r")
+for line in f:
+    bot.consistency_list.append(line.strip("\n"))
+f.close()
+
 
 @bot.event
 async def on_ready():
@@ -38,6 +44,18 @@ async def on_ready():
     print(bot.user.name)
     print(bot.user.id)
     print('------------------')
+    for word in bot.consistency_list:
+        in_white_list = False
+        for whiteword in bot.white_list:
+            if whiteword in word:
+                in_white_list = True
+                break
+        if not in_white_list:
+            print("Not white listning:",word)
+    for word in bot.white_list:
+        for badword in bot.censor_list:
+            if word in badword:
+                print("White list overlapping with cenosr list:",word,badword)
     
 
 @bot.event
@@ -174,6 +192,57 @@ async def remove_censor_list(ctx, remove_word):
             bot.censor_list.remove(remove_word)
             f = open("censor_list.txt","w+")
             for word in bot.censor_list:
+                f.write(word+"\n")
+            f.close()
+    if "Direct Message" not in str(ctx.channel):
+        await ctx.message.delete()
+        
+
+@bot.command()
+async def get_consistency_list(ctx):
+    if ctx.author.id not in bot.admins:
+        await ctx.send("Haha denied! "+ctx.author.mention)
+    else:
+        say = ""
+        for word in sorted(bot.consistency_list):
+            say += word+"\n"
+            if len(say) > 1900:
+                await ctx.send(say)
+                say = ""
+        await ctx.send(say)
+    if "Direct Message" not in str(ctx.channel):
+        await ctx.message.delete()
+ 
+ 
+@bot.command()
+async def add_consistency_list(ctx, word):
+    if ctx.author.id not in bot.admins:
+        await ctx.send("Haha denied! "+ctx.author.mention)
+    else:
+        word = word.lower()
+        if word not in bot.censor_list:
+            bot.consistency_list.append(word)
+            f = open("consistency_list.txt","a")
+            f.write("\n"+word)
+            f.close()
+    if "Direct Message" not in str(ctx.channel):
+        await ctx.message.delete()
+
+
+@bot.command()
+async def remove_consistency_list(ctx, remove_word):
+    if ctx.author.id not in bot.admins:
+        await ctx.send("Haha denied! "+ctx.author.mention)
+    else:
+        remove_word = remove_word.lower()
+        if remove_word in bot.consistency_list:
+            f = open("consistency_list.txt.bak","w+")
+            for word in bot.consistency_list:
+                f.write(word+"\n")
+            f.close()
+            bot.consistency_list.remove(remove_word)
+            f = open("consistency_list.txt","w+")
+            for word in bot.consistency_list:
                 f.write(word+"\n")
             f.close()
     if "Direct Message" not in str(ctx.channel):
