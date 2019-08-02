@@ -388,6 +388,7 @@ async def on_message(msg):
     
     
     """CENSORING"""
+    ascii_letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     censored_msg = msg.content.lower()
     censored = False
     for item in bot.censor_list:
@@ -408,6 +409,15 @@ async def on_message(msg):
                     if item in original_word[i].lower():
                         censored_word[i] = original_word[i]
                         break
+        for i in range(len(censored_word)):
+            if "□" in censored_word[i]:
+                new_word = ""
+                for letter in censored_word[i]:
+                    if letter in ascii_letters:
+                        new_word += "□"
+                    else:
+                        new_word += letter
+                censored_word[i] = new_word
         censored_msg = " ".join(censored_word)
         if "□" in censored_msg and censored_msg[0] != ">" and censored_msg[0:2] != ";;":
             await msg.channel.send(msg.author.mention+" says(censored version):\n"+censored_msg)
@@ -467,6 +477,7 @@ async def on_message_edit(old_msg, msg):
         return
 
     """CENSORING"""
+    ascii_letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     censored_msg = msg.content.lower()
     censored = False
     for item in bot.censor_list:
@@ -487,6 +498,15 @@ async def on_message_edit(old_msg, msg):
                     if item in original_word[i]:
                         censored_word[i] = original_word[i]
                         break
+        for i in range(len(censored_word)):
+            if "□" in censored_word[i]:
+                new_word = ""
+                for letter in censored_word[i]:
+                    if letter in ascii_letters:
+                        new_word += "□"
+                    else:
+                        new_word += letter
+                censored_word[i] = new_word
         censored_msg = " ".join(censored_word)
         if "□" in censored_msg:
             await msg.channel.send(msg.author.mention+" says(censored version):\n"+censored_msg)
@@ -501,6 +521,7 @@ async def on_member_update(before, after):
         return
     
     """CENSORING"""
+    ascii_letters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
     if after.nick != None:
         censored_msg = after.nick.lower()
         censored = False
@@ -522,6 +543,16 @@ async def on_member_update(before, after):
                         if item in original_word[i].lower():
                             censored_word[i] = original_word[i]
                             break
+            for i in range(len(censored_word)):
+                if "□" in censored_word[i]:
+                    new_word = ""
+                    for letter in censored_word[i]:
+                        if letter in ascii_letters:
+                            new_word += "□"
+                        else:
+                            new_word += letter
+                    censored_word[i] = new_word
+            censored_msg = " ".join(censored_word)
             censored_msg = " ".join(censored_word)
             if "□" in censored_msg:
                 await after.edit(nick=censored_msg)
