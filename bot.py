@@ -437,7 +437,7 @@ async def on_message(msg):
          
          
     """IM RESPONSE"""
-    iam_list = ["im ", "i'm ", "i am ", "Im ", "I'm ", "I am ", "I AM ", "I'M "]
+    iam_list = ["im ", "Im ", "iM ", "IM ", "i'm ", "I'm ", "i'M ", "I'M ", "i am ", "I am ", "i Am ", "i aM ", "I Am ", "I aM ", "i AM ", "I AM "]
     if len(msg.content.split()) < 7:
         for item in iam_list:
             if item in msg.content[0:5]:
